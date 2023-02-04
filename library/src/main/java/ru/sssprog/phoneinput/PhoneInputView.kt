@@ -68,6 +68,7 @@ class PhoneInputView @JvmOverloads constructor(
                 }
                 canValidate = false
 
+                // Don't allow text insertion in the middle. It can mess with phone formatting
                 if (!inserted) {
                     phone = updatePhone(s.toString(), deleted)
                 }
@@ -90,7 +91,6 @@ class PhoneInputView @JvmOverloads constructor(
                 0
             }
             val countryCode = phoneNumberUtil.getRegionCodeForCountryCode(callingCode)
-//            Timber.d("countryCode for code $callingCode, $countryCode")
             if (countryCode !in listOf("ZZ", "001")) {
                 return countryCode
             }
@@ -102,7 +102,6 @@ class PhoneInputView @JvmOverloads constructor(
     @SuppressLint("SetTextI18n")
     private fun updatePhone(input: String, deleted: Boolean): String {
         val countryCode = findCountry(input)
-//        Timber.d("countryCode $countryCode")
         if (countryCode == null) {
             maskView.text = null
             return input
@@ -117,6 +116,7 @@ class PhoneInputView @JvmOverloads constructor(
             formatPhoneNumber(input, mask)
         }
 
+        // Make beginning of string invisible. So, EditText's text won't be overlayed on top of mask text
         val maskText = SpannableStringBuilder(formattedPhoneNumber + mask.substring(formattedPhoneNumber.length))
         maskText.setSpan(ForegroundColorSpan(Color.TRANSPARENT), 0, formattedPhoneNumber.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
         maskView.text = maskText
